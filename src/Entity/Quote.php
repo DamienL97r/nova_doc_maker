@@ -44,12 +44,8 @@ class Quote
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     private ?string $total = null;
 
-    #[ORM\OneToMany(mappedBy: 'quote', targetEntity: QuoteItem::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
-    private Collection $items;
-
     public function __construct()
     {
-        $this->items = new ArrayCollection();
         $this->issueDate = new \DateTimeImmutable();
     }
 
