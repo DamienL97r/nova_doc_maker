@@ -1,11 +1,12 @@
 # NovaDoc Maker
 
+NovaDoc Maker is a simple and efficient tool to quickly generate professional quotes and invoices.
 
 ## Technical Stack
 
 ### Backend
 - **PHP 8.4**: Latest stable version with modern features and performance improvements
-- **Symfony 7.3**: Enterprise-grade PHP framework for robust API development
+- **Symfony 7.3**: Enterprise-grade PHP framework
 - **Doctrine ORM**: Powerful object-relational mapper for database interactions
 
 ### Infrastructure
@@ -22,9 +23,13 @@
 
 Clone the repository:
 ```bash
-git clone https://github.com/damienL97r/nova_doc_maker
+git clone https://github.com/DamienL97r/nova_doc_maker.git
 ```
 
+Install dependencies:
+```bash
+composer install
+```
 
 Build and start Docker containers:
 ```bash
