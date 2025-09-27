@@ -1,0 +1,461 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}NovaDoc Maker — Create quotes & invoices in minutes{% endblock %}
+
+{% block body %}
+<div class="bg-white dark:bg-gray-950">
+    <!-- Header -->
+    <header class="absolute inset-x-0 top-0 z-50">
+        <nav aria-label="Global" class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
+            <div class="flex items-center gap-3 lg:flex-1">
+                <a href="/" class="-m-1.5 flex items-center gap-3 p-1.5">
+                    <span class="sr-only">NovaDoc Maker</span>
+                    <span
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-sm dark:bg-indigo-500">
+                        <!-- Simple logomark -->
+                        <svg viewBox="0 0 24 24" aria-hidden="true" class="h-5 w-5">
+                            <path
+                                d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v11A2.5 2.5 0 0 1 16.5 20h-9A2.5 2.5 0 0 1 5 17.5v-11Z"
+                                fill="currentColor" opacity=".15" />
+                            <path d="M8 8h5m-5 4h8m-8 4h8" stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" />
+                            <path d="M15 4v3.5A1.5 1.5 0 0 0 16.5 9H20" stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" />
+                        </svg>
+                    </span>
+                    <span class="text-base font-semibold tracking-tight text-gray-900 dark:text-white">NovaDoc
+                        Maker</span>
+                </a>
+            </div>
+
+            <div class="flex lg:hidden">
+                <button type="button" command="show-modal" commandfor="mobile-menu"
+                    class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700 dark:text-gray-200">
+                    <span class="sr-only">Open main menu</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"
+                        class="size-6">
+                        <path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="hidden lg:flex lg:gap-x-10">
+                <a href="#features"
+                    class="text-sm font-semibold text-gray-900 hover:text-indigo-600 dark:text-gray-100 dark:hover:text-indigo-400">Features</a>
+                <a href="#how"
+                    class="text-sm font-semibold text-gray-900 hover:text-indigo-600 dark:text-gray-100 dark:hover:text-indigo-400">How
+                    it works</a>
+                <a href="#pricing"
+                    class="text-sm font-semibold text-gray-900 hover:text-indigo-600 dark:text-gray-100 dark:hover:text-indigo-400">Pricing</a>
+                <a href="#faq"
+                    class="text-sm font-semibold text-gray-900 hover:text-indigo-600 dark:text-gray-100 dark:hover:text-indigo-400">FAQ</a>
+            </div>
+
+            <div class="hidden lg:flex lg:flex-1 lg:justify-end gap-3">
+                <a href="/login" class="text-sm font-semibold text-gray-900 dark:text-gray-100">Log in <span
+                        aria-hidden="true">→</span></a>
+                <a href="#cta"
+                    class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:hover:bg-indigo-400">Get
+                    started</a>
+            </div>
+        </nav>
+
+        <!-- Mobile menu (Tailwind Elements minimal) -->
+        <el-dialog>
+            <dialog id="mobile-menu" class="backdrop:bg-black/50 lg:hidden">
+                <div tabindex="0" class="fixed inset-0 focus:outline-none">
+                    <el-dialog-panel
+                        class="fixed inset-y-0 right-0 z-50 w-full max-w-xs overflow-y-auto bg-white p-6 shadow-xl sm:ring-1 sm:ring-gray-900/10 dark:bg-gray-900 dark:sm:ring-white/10">
+                        <div class="flex items-center justify-between">
+                            <a href="/" class="-m-1.5 flex items-center gap-3 p-1.5">
+                                <span class="sr-only">NovaDoc Maker</span>
+                                <span
+                                    class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white dark:bg-indigo-500">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true" class="h-5 w-5">
+                                        <path
+                                            d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v11A2.5 2.5 0 0 1 16.5 20h-9A2.5 2.5 0 0 1 5 17.5v-11Z"
+                                            fill="currentColor" opacity=".15" />
+                                        <path d="M8 8h5m-5 4h8m-8 4h8" stroke="currentColor" stroke-width="1.5"
+                                            stroke-linecap="round" />
+                                        <path d="M15 4v3.5A1.5 1.5 0 0 0 16.5 9H20" stroke="currentColor"
+                                            stroke-width="1.5" stroke-linecap="round" />
+                                    </svg>
+                                </span>
+                                <span
+                                    class="text-base font-semibold tracking-tight text-gray-900 dark:text-white">NovaDoc
+                                    Maker</span>
+                            </a>
+                            <button type="button" command="close" commandfor="mobile-menu"
+                                class="-m-2.5 rounded-md p-2.5 text-gray-700 dark:text-gray-300">
+                                <span class="sr-only">Close menu</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                                    aria-hidden="true" class="size-6">
+                                    <path d="M6 18 18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="mt-6 space-y-2">
+                            <a href="#features"
+                                class="block rounded-lg px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5">Features</a>
+                            <a href="#how"
+                                class="block rounded-lg px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5">How
+                                it works</a>
+                            <a href="#pricing"
+                                class="block rounded-lg px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5">Pricing</a>
+                            <a href="#faq"
+                                class="block rounded-lg px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5">FAQ</a>
+                            <a href="/login"
+                                class="block rounded-lg px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5">Log
+                                in</a>
+                            <a href="#cta"
+                                class="mt-2 block rounded-lg bg-indigo-600 px-3 py-2 text-center text-base font-semibold text-white hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400">Get
+                                started</a>
+                        </div>
+                    </el-dialog-panel>
+                </div>
+            </dialog>
+        </el-dialog>
+    </header>
+
+    <!-- Decorative background -->
+    <div class="relative isolate px-6 pt-24 lg:px-8">
+        <div aria-hidden="true"
+            class="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
+            <div
+                class="relative left-1/2 aspect-[1155/678] w-[36rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-indigo-300 to-fuchsia-300 opacity-30 sm:w-[72rem]">
+            </div>
+        </div>
+
+        <!-- Hero -->
+        <section class="mx-auto max-w-4xl py-16 sm:py-24 lg:py-28 text-center">
+            <h1 class="text-4xl font-semibold tracking-tight text-gray-900 sm:text-6xl dark:text-white">
+                Create <span class="text-indigo-600 dark:text-indigo-400">quotes</span> & <span
+                    class="text-indigo-600 dark:text-indigo-400">invoices</span> in minutes
+            </h1>
+            <p class="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
+                NovaDoc Maker streamlines your admin work with fast templates, automatic numbering, tax handling, and
+                beautiful PDFs you can send immediately.
+            </p>
+            <div class="mt-10 flex items-center justify-center gap-x-4">
+                <a id="cta" href="/signup"
+                    class="rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:hover:bg-indigo-400">Start
+                    free</a>
+                <a href="#features"
+                    class="text-sm font-semibold text-gray-900 hover:text-indigo-600 dark:text-gray-100 dark:hover:text-indigo-400">See
+                    features <span aria-hidden="true">→</span></a>
+            </div>
+            <div
+                class="mt-14 rounded-2xl border border-gray-200/60 bg-white p-3 shadow-sm ring-1 ring-gray-900/5 backdrop-blur-sm dark:border-white/10 dark:bg-gray-900/50 dark:ring-white/10">
+                <img src="https://images.unsplash.com/photo-1516570161787-2fd917215a3d?q=80&w=1200&auto=format&fit=crop"
+                    alt="NovaDoc Maker preview" class="w-full rounded-xl object-cover" />
+            </div>
+        </section>
+
+        <!-- Logos / Social proof -->
+        <section class="mx-auto max-w-6xl pb-10">
+            <p class="text-center text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">Trusted by
+                freelancers & small businesses</p>
+            <div class="mt-6 grid grid-cols-2 items-center gap-8 opacity-70 sm:grid-cols-4">
+                <div
+                    class="h-8 bg-[url('https://tailwindcss.com/_next/static/media/tuple.74eb0ae0.svg')] bg-contain bg-center bg-no-repeat">
+                </div>
+                <div
+                    class="h-8 bg-[url('https://tailwindcss.com/_next/static/media/savvycal.6c65b9db.svg')] bg-contain bg-center bg-no-repeat">
+                </div>
+                <div
+                    class="h-8 bg-[url('https://tailwindcss.com/_next/static/media/laravel.6eec2f7e.svg')] bg-contain bg-center bg-no-repeat">
+                </div>
+                <div
+                    class="h-8 bg-[url('https://tailwindcss.com/_next/static/media/transistor.7274e6a9.svg')] bg-contain bg-center bg-no-repeat">
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section id="features" class="mx-auto max-w-6xl py-16 sm:py-24">
+            <div class="mx-auto max-w-2xl text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">Everything you
+                    need to bill with confidence</h2>
+                <p class="mt-4 text-gray-600 dark:text-gray-300">Focus on your work, not your paperwork. NovaDoc Maker
+                    wraps best practices into a clean, fast workflow.</p>
+            </div>
+            <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div
+                    class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-gray-900">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M6 7h12M6 11h12M6 15h8" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <h3 class="mt-4 text-base font-semibold text-gray-900 dark:text-white">Quotes & invoices</h3>
+                    <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">Generate professional documents
+                        with your logo, brand colors, and legal mentions.</p>
+                </div>
+                <div
+                    class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-gray-900">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M7 7h10v10H7z" />
+                            <path d="M7 12h10" />
+                        </svg>
+                    </div>
+                    <h3 class="mt-4 text-base font-semibold text-gray-900 dark:text-white">Automatic numbering</h3>
+                    <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">Sequential IDs with prefixes per
+                        year or client, so you always stay compliant.</p>
+                </div>
+                <div
+                    class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-gray-900">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M12 3v18M3 12h18" />
+                        </svg>
+                    </div>
+                    <h3 class="mt-4 text-base font-semibold text-gray-900 dark:text-white">Taxes & totals</h3>
+                    <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">Multi-rate VAT, discounts, and
+                        automatic totals with proper rounding.</p>
+                </div>
+                <div
+                    class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-gray-900">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M7 7h10v10H7z" />
+                            <path d="M4 17l4 4" />
+                        </svg>
+                    </div>
+                    <h3 class="mt-4 text-base font-semibold text-gray-900 dark:text-white">PDF export</h3>
+                    <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">One-click, pixel-perfect PDFs
+                        ready to send or archive.</p>
+                </div>
+                <div
+                    class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-gray-900">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M8 12h8M8 16h5" />
+                            <path d="M4 7h16v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7Z" />
+                        </svg>
+                    </div>
+                    <h3 class="mt-4 text-base font-semibold text-gray-900 dark:text-white">Clients & items</h3>
+                    <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">Store client details and your
+                        catalog of services with unit prices.</p>
+                </div>
+                <div
+                    class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-gray-900">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M5 12h14" />
+                            <path d="M7 8l-4 4 4 4" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <h3 class="mt-4 text-base font-semibold text-gray-900 dark:text-white">Send & track</h3>
+                    <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">Share links or attachments and
+                        track payment status (paid / due / overdue).</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How it works -->
+        <section id="how" class="mx-auto max-w-6xl py-16 sm:py-24">
+            <div class="grid items-center gap-10 lg:grid-cols-2">
+                <div>
+                    <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">From blank
+                        page to PDF in 4 steps</h2>
+                    <ol class="mt-6 space-y-6">
+                        <li class="flex gap-4">
+                            <span
+                                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">1</span>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Add your business & branding
+                                </h3>
+                                <p class="text-gray-600 dark:text-gray-300">Logo, colors, legal mentions and invoice
+                                    numbering format.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4">
+                            <span
+                                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">2</span>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Create a quote</h3>
+                                <p class="text-gray-600 dark:text-gray-300">Pick a client, add items with quantities,
+                                    VAT and discounts.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4">
+                            <span
+                                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">3</span>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Convert to invoice</h3>
+                                <p class="text-gray-600 dark:text-gray-300">One click to transform an accepted quote
+                                    into a numbered invoice.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4">
+                            <span
+                                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">4</span>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Export & send</h3>
+                                <p class="text-gray-600 dark:text-gray-300">Download a clean PDF or email it right away.
+                                </p>
+                            </div>
+                        </li>
+                    </ol>
+                    <div class="mt-8 flex gap-3">
+                        <a href="/signup"
+                            class="rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:hover:bg-indigo-400">Try
+                            it now</a>
+                        <a href="/docs"
+                            class="rounded-xl border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-50 dark:border-white/10 dark:text-gray-100 dark:hover:bg-white/5">Read
+                            the docs</a>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div
+                        class="absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-tr from-indigo-200 to-transparent blur-2xl dark:from-indigo-500/20">
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1554224155-3a589877462f?q=80&w=1200&auto=format&fit=crop"
+                        alt="Editor UI" class="rounded-2xl shadow-2xl ring-1 ring-gray-900/10 dark:ring-white/10" />
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing -->
+        <section id="pricing" class="mx-auto max-w-6xl py-16 sm:py-24">
+            <div class="mx-auto max-w-2xl text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">Simple pricing
+                </h2>
+                <p class="mt-4 text-gray-600 dark:text-gray-300">Start free. Upgrade when you need advanced features.
+                </p>
+            </div>
+            <div class="mt-10 grid gap-6 sm:grid-cols-2">
+                <div
+                    class="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-gray-900">
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Free</h3>
+                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">For getting started.</p>
+                    <p class="mt-4 text-4xl font-bold text-gray-900 dark:text-white">€0<span
+                            class="text-base font-medium text-gray-500 dark:text-gray-400">/mo</span></p>
+                    <ul class="mt-6 space-y-3 text-sm text-gray-600 dark:text-gray-300">
+                        <li>✓ Unlimited quotes</li>
+                        <li>✓ 10 invoices / month</li>
+                        <li>✓ PDF export</li>
+                    </ul>
+                    <a href="/signup"
+                        class="mt-8 inline-flex w-full justify-center rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100">Choose
+                        Free</a>
+                </div>
+                <div
+                    class="relative rounded-2xl border border-indigo-500/30 bg-gradient-to-b from-indigo-50 to-white p-8 shadow-sm ring-1 ring-indigo-500/20 dark:from-indigo-900/10 dark:to-gray-900">
+                    <span
+                        class="absolute -top-3 right-4 rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow-sm">Popular</span>
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Pro</h3>
+                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">For growing teams and heavy use.</p>
+                    <p class="mt-4 text-4xl font-bold text-gray-900 dark:text-white">€9<span
+                            class="text-base font-medium text-gray-500 dark:text-gray-400">/mo</span></p>
+                    <ul class="mt-6 space-y-3 text-sm text-gray-700 dark:text-gray-300">
+                        <li>✓ Unlimited invoices</li>
+                        <li>✓ Custom templates</li>
+                        <li>✓ Payment status tracking</li>
+                        <li>✓ Priority support</li>
+                    </ul>
+                    <a href="/checkout"
+                        class="mt-8 inline-flex w-full justify-center rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500">Go
+                        Pro</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" class="mx-auto max-w-6xl py-16 sm:py-24">
+            <div class="mx-auto max-w-2xl text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">Frequently asked
+                    questions</h2>
+            </div>
+            <div
+                class="mx-auto mt-10 max-w-3xl divide-y divide-gray-200 rounded-2xl border border-gray-200 bg-white dark:divide-white/10 dark:border-white/10 dark:bg-gray-900">
+                <details class="group p-6" open>
+                    <summary
+                        class="flex cursor-pointer list-none items-center justify-between text-left text-base font-semibold text-gray-900 dark:text-white">
+                        Can I customize templates?
+                        <span class="transition-transform group-open:rotate-180">▾</span>
+                    </summary>
+                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">Yes. Upload your logo, set brand colors,
+                        edit headers/footers and legal mentions.</p>
+                </details>
+                <details class="group p-6">
+                    <summary
+                        class="flex cursor-pointer list-none items-center justify-between text-left text-base font-semibold text-gray-900 dark:text-white">
+                        Do you support VAT and multiple currencies?
+                        <span class="transition-transform group-open:rotate-180">▾</span>
+                    </summary>
+                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">Absolutely. Use different VAT rates per
+                        line item and pick your currency per document.</p>
+                </details>
+                <details class="group p-6">
+                    <summary
+                        class="flex cursor-pointer list-none items-center justify-between text-left text-base font-semibold text-gray-900 dark:text-white">
+                        Is there an API?
+                        <span class="transition-transform group-open:rotate-180">▾</span>
+                    </summary>
+                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">A REST API is available on Pro to create
+                        clients, quotes and invoices programmatically.</p>
+                </details>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="mx-auto max-w-6xl pb-24">
+            <div
+                class="relative isolate overflow-hidden rounded-3xl bg-gradient-to-tr from-indigo-600 to-fuchsia-600 px-8 py-12 shadow-xl dark:from-indigo-500 dark:to-fuchsia-500">
+                <div class="mx-auto max-w-2xl text-center">
+                    <h2 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">Ready to send your next
+                        invoice?</h2>
+                    <p class="mt-3 text-white/80">Start free today and create a professional PDF in minutes.</p>
+                    <div class="mt-6 flex items-center justify-center gap-3">
+                        <a href="/signup"
+                            class="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-gray-900 shadow hover:bg-gray-50">Create
+                            my account</a>
+                        <a href="/demo"
+                            class="rounded-xl bg-black/20 px-5 py-3 text-sm font-semibold text-white ring-1 ring-inset ring-white/30 hover:bg-black/30">Watch
+                            a demo</a>
+                    </div>
+                </div>
+                <div aria-hidden="true"
+                    class="pointer-events-none absolute -right-10 -top-10 h-64 w-64 rounded-full bg-white/10 blur-3xl">
+                </div>
+            </div>
+        </section>
+
+        <div aria-hidden="true"
+            class="absolute inset-x-0 top-[calc(100%-14rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]">
+            <div
+                class="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36rem] -translate-x-1/2 bg-gradient-to-tr from-indigo-300 to-fuchsia-300 opacity-30 sm:w-[72rem]">
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-200 py-10 dark:border-white/10">
+        <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-6 sm:flex-row lg:px-8">
+            <p class="text-sm text-gray-500 dark:text-gray-400">© {{ "now"|date('Y') }} NovaDoc Maker. All rights
+                reserved.</p>
+            <nav class="flex items-center gap-6 text-sm">
+                <a href="/privacy"
+                    class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">Privacy</a>
+                <a href="/terms"
+                    class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">Terms</a>
+                <a href="https://github.com/yourrepo"
+                    class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">GitHub</a>
+            </nav>
+        </div>
+    </footer>
+</div>
+
+<!-- If you use Tailwind Elements for the dialog component, include the script below or install via npm. -->
+{#
+<script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script> #}
+{% endblock %}

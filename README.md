@@ -37,3 +37,19 @@ cp compose.override.yaml.dist compose.override.yaml
 docker compose build --no-cache
 docker compose up -d --wait
 ```
+
+## Tailwind
+
+Compile CSS
+```bash
+php bin/console tailwind:build --watch
+```
+
+# Deploying
+
+When you deploy, run the tailwind:build command before the asset-map:compile command so the built file is available:
+
+```bash
+php bin/console tailwind:build --minify
+php bin/console asset-map:compile
+```
