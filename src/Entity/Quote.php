@@ -44,9 +44,20 @@ class Quote
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     private ?string $total = null;
 
+    #[ORM\ManyToOne(inversedBy: 'quotes')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Owner $owner = null;
+
+    /**
+     * @var Collection<int, QuoteItem>
+     */
+    #[ORM\OneToMany(targetEntity: QuoteItem::class, mappedBy: 'quote')]
+    private Collection $items;
+
     public function __construct()
     {
         $this->issueDate = new \DateTimeImmutable();
+        $this->items = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -158,6 +169,48 @@ class Quote
     public function setTotal(?string $total): static
     {
         $this->total = $total;
+
+        return $this;
+    }
+
+    public function getOwner(): ?Owner
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?Owner $owner): static
+    {
+        $this->owner = $owner;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, QuoteItem>
+     */
+    public function getItems(): Collection
+    {
+        return $this->items;
+    }
+
+    public function addItem(QuoteItem $item): static
+    {
+        if (!$this->items->contains($item)) {
+            $this->items->add($item);
+            $item->setQuote($this);
+        }
+
+        return $this;
+    }
+
+    public function removeItem(QuoteItem $item): static
+    {
+        if ($this->items->removeElement($item)) {
+            // set the owning side to null (unless already changed)
+            if ($item->getQuote() === $this) {
+                $item->setQuote(null);
+            }
+        }
 
         return $this;
     }
