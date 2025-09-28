@@ -32,6 +32,10 @@ class QuoteItem
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
+    #[ORM\ManyToOne(inversedBy: 'items')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Quote $quote = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -105,6 +109,18 @@ class QuoteItem
     public function setTitle(string $title): static
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    public function getQuote(): ?Quote
+    {
+        return $this->quote;
+    }
+
+    public function setQuote(?Quote $quote): static
+    {
+        $this->quote = $quote;
 
         return $this;
     }
