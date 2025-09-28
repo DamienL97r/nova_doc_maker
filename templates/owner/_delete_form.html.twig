@@ -1,0 +1,5 @@
+<form method="post" action="{{ path('owner_delete', {id: owner.id}) }}" onsubmit="return confirm('Delete this owner?');"
+    style="display:inline">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete_owner_' ~ owner.id) }}">
+    <button class="btn btn-danger">Delete</button>
+</form>
