@@ -52,6 +52,10 @@ Compile CSS
 php bin/console tailwind:build --watch
 ```
 
+```bash
+docker compose exec app-php php bin/console asset-map:compile
+```
+
 ### Deploying
 
 When you deploy, run the tailwind:build command before the asset-map:compile command so the built file is available:

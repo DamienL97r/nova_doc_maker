@@ -85,7 +85,10 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
-        ]
+        ],
+        "assets:clean": "rm -rf public/assets/*",
+        "tailwind:watch": "tailwindcss -i ./assets/styles/app.css -o ./public/assets/app.css --watch",
+        "tailwind:build": "tailwindcss -i ./assets/styles/app.css -o ./public/assets/app.css --minify"
     },
     "conflict": {
         "symfony/symfony": "*"

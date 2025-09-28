@@ -39,6 +39,12 @@ class Owner
     #[ORM\OneToMany(targetEntity: Quote::class, mappedBy: 'owner')]
     private Collection $quotes;
 
+    #[ORM\Column(length: 255)]
+    private ?string $companyName = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $logo = null;
+
     public function __construct()
     {
         $this->quotes = new ArrayCollection();
@@ -147,6 +153,35 @@ class Owner
                 $quote->setOwner(null);
             }
         }
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return trim(($this->firstname ?? '') . ' ' . ($this->lastname ?? '')) ?: 'Owner #' . $this->id;
+    }
+
+    public function getCompanyName(): ?string
+    {
+        return $this->companyName;
+    }
+
+    public function setCompanyName(string $companyName): static
+    {
+        $this->companyName = $companyName;
+
+        return $this;
+    }
+
+    public function getLogo(): ?string
+    {
+        return $this->logo;
+    }
+
+    public function setLogo(?string $logo): static
+    {
+        $this->logo = $logo;
 
         return $this;
     }

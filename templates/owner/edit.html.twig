@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+{% block title %}Edit Owner{% endblock %}
+{% block body %}
+{% form_theme form 'form/tw_theme.html.twig' %}
+
+<h1>Edit Owner</h1>
+{% include 'owner/_form.html.twig' with { form: form, owner: owner, button_label: 'Save' } %}
+<hr class="my-6">
+{% include 'owner/_delete_form.html.twig' with { owner: owner } %}
+{% endblock %}

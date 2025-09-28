@@ -1,12 +1,16 @@
 # syntax=docker/dockerfile:1.4
 
-#FROM mariadb as database_upstream
+# (Optionnel) stage postgres - pas utilisé par l'image app-php, conservé pour compat
 FROM postgres as database_upstream
 
+# =========================
+# PHP-FPM (app_dev)
+# =========================
 FROM mztrix/php-fpm as app_dev
 
 WORKDIR /var/www/app
 
+# Paquets PHP & outils
 RUN set -eux; \
     apk add --no-cache \
     php84-phar \
@@ -22,81 +26,84 @@ RUN set -eux; \
     php84-xmlwriter \
     php84-intl \
     php84-session \
-    php84-pdo  \
+    php84-pdo \
     php84-pdo_pgsql \
     php84-pecl-xdebug \
     acl \
     file \
     gettext \
     git \
-    ;
+    curl \
+    ca-certificates; \
+    update-ca-certificates
 
+# ---- Tailwind CSS (binaire Alpine/musl) ----
+# IMPORTANT: on télécharge *tailwindcss-linux-x64-musl* (et pas linux-x64)
+RUN set -eux; \
+    TAILWIND=/usr/local/bin/tailwindcss; \
+    curl -fsSL \
+    https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64-musl \
+    -o "$TAILWIND"; \
+    chmod +x "$TAILWIND"; \
+    "$TAILWIND" -v
+
+# ---- Sessions PHP: dossier + droits + conf ----
+RUN set -eux; \
+    mkdir -p /var/lib/php/sessions; \
+    chown -R www-data:www-data /var/lib/php; \
+    chmod 1733 /var/lib/php/sessions; \
+    printf "session.save_handler = files\nsession.save_path = \"/var/lib/php/sessions\"\n" \
+    > /etc/php84/conf.d/99-sessions.ini
+
+# ---- Socket PHP-FPM: dossier (partagé avec Nginx via volume) ----
+RUN set -eux; \
+    mkdir -p /var/run/php; \
+    chown -R www-data:www-data /var/run/php
+
+# Confiance git dans /var/www/app
 RUN git config --global --add safe.directory /var/www/app
 
-COPY --link .docker/php/conf.d/app.ini  /etc/php84/php.ini
+# Tes overrides PHP .ini
+COPY --link .docker/php/conf.d/app.ini        /etc/php84/php.ini
 COPY --link .docker/php/conf.d/50_xdebug.ini  /etc/php84/conf.d/50_xdebug.ini
-#  Copy Composer from the composer/composer image
+
+# Composer depuis l'image officielle
 COPY --from=composer/composer:2-bin --link /composer /usr/local/bin/composer
 
-# Copy only composer.json and composer.lock to leverage Docker caching
+# Composer files pour le cache des layers
 COPY --chown=www-data:www-data composer.json composer.lock ./
 
+# Vendor en volume (comme tu fais déjà via docker compose)
 VOLUME /var/www/app/vendor
-# Add the Docker entrypoint script
+
+# Entrypoint custom
 COPY --link .docker/php/entrypoint.sh /usr/local/bin/entrypoint
 RUN set -eux; chmod +x /usr/local/bin/entrypoint
 
-# Set the default entrypoint script
+# Démarrage
 ENTRYPOINT ["entrypoint"]
 
+# =========================
+# (Optionnel) Stage DB
+# =========================
 FROM database_upstream as database_dev
+# (rien ici – tu utilises l'image postgres via docker compose)
 
-#ENV MARIADB_ROOT_PASSWORD=password \
-#    MARIADB_USER=user \
-#    MARIADB_PASSWORD=password \
-#    MARIADB_DATABASE=dbname
-#
-#RUN set -eux; \
-#    apk --no-cache update; \
-#    apk add --no-cache mariadb mariadb-client mariadb-server-utils;
-#
-#RUN mkdir -p /run/mysqld && chown -R mysql:mysql /run/mysqld; \
-#    mkdir -p /var/lib/mysql && chown -R mysql:mysql /var/lib/mysql;
-#
-#COPY --link  .docker/mariadb/entrypoint.sh /usr/bin/entrypoint
-#
-#ENTRYPOINT ["entrypoint"]
-#
-#COPY --link .docker/mariadb/my.cnf.d/mariadb-server.cnf  /etc/my.cnf.d/mariadb-server.cnf
-## Add the Docker entrypoint script
-#COPY --link .docker/mariadb/healthcheck.sh /usr/local/bin/healthcheck
-
-# Define a healthcheck command for the container
-#HEALTHCHECK  \
-#  --interval=10s  \
-#  --timeout=5s  \
-#  --start-period=10s  \
-#  --retries=3 \
-#  CMD ["healthcheck","--connect", "--innodb_initialized"]
-
-#EXPOSE 3306
-
-# Build Stage for Nginx
+# =========================
+# Nginx
+# =========================
 FROM nginx:alpine AS nginx_dev
 
-# Définir le répertoire de travail
 WORKDIR /var/www/app/public
 
 RUN set -eux; \
     echo -e "\e[1;33m===> Creating www-data user for PHP-FPM\e[0m"; \
     adduser -D -u 82 -S -G www-data -s /sbin/nologin www-data; \
-    echo -e "\e[1;33m===> www-data user created with UID 82 and GID 82\e[0m"; \
     chown -R www-data:www-data /var/www/app; \
-    echo -e "\e[1;33m===> Set ownership of /var/www to www-data:www-data\e[0m";
+    echo -e "\e[1;33m===> Set ownership of /var/www to www-data:www-data\e[0m"
 
-# Copier la configuration spécifique de Nginx
+# Config Nginx
 COPY --link .docker/nginx/sites-enabled/api.conf /etc/nginx/conf.d/default.conf
-COPY --link .docker/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY --link .docker/nginx/nginx.conf             /etc/nginx/nginx.conf
 
-# Commande par défaut pour démarrer Nginx en mode foreground
 CMD ["nginx", "-g", "daemon off;"]
