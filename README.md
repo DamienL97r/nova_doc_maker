@@ -38,6 +38,13 @@ docker compose build --no-cache
 docker compose up -d --wait
 ```
 
+Run server:
+```bash
+symfony serve
+```
+
+Enjoy your link : [http://127.0.0.1:8000](http://127.0.0.1:8000)
+
 ## Tailwind
 
 Compile CSS
@@ -45,7 +52,7 @@ Compile CSS
 php bin/console tailwind:build --watch
 ```
 
-# Deploying
+### Deploying
 
 When you deploy, run the tailwind:build command before the asset-map:compile command so the built file is available:
 
