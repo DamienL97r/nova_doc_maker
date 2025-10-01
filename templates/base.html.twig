@@ -37,7 +37,16 @@
 </head>
 
 <body class="font-sans min-h-dvh bg-white text-slate-800 dark:bg-slate-900 dark:text-slate-100">
-    {% block body %}{% endblock %}
+    {% block body %}
+    {% for label, messages in app.flashes %}
+    {% for message in messages %}
+    <div
+        class="mx-auto mt-4 w-fit rounded-md bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-400/30">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endfor %}
+    {% endblock %}
 </body>
 
 </html>

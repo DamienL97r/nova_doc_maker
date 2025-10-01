@@ -1,11 +1,10 @@
 {% extends 'base.html.twig' %}
-{% block title %}New Owner{% endblock %}
-
+{% block title %}New Customer{% endblock %}
 {% block body %}
 <div class="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-    <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">New Owner</h1>
+    <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">New Customer</h1>
     <div class="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5 dark:bg-white/5 dark:ring-white/10">
-        {% include 'owner/_form.html.twig' with { form: form } %}
+        {% include 'customer/_form.html.twig' with { form: form } %}
     </div>
 </div>
 {% endblock %}
