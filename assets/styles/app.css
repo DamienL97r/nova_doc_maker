@@ -1,9 +1,11 @@
-@import "tailwindcss";
-@source "./templates/**/*.twig";
-@source "./assets/**/*.js";
-@source "./assets/**/*.ts";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme {
-    --font-sans: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-        Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+/* Facultatif : ta stack */
+@layer base {
+    :root {
+        --font-sans: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+            Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+    }
 }
