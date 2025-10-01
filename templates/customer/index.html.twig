@@ -1,17 +1,16 @@
-{# templates/owner/index.html.twig #}
 {% extends 'base.html.twig' %}
-{% block title %}Owners{% endblock %}
+{% block title %}Customers{% endblock %}
 
 {% block body %}
 <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Owners</h1>
-            <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">{{ owners|length }} result(s)</p>
+            <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Customers</h1>
+            <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">{{ customers|length }} result(s)</p>
         </div>
-        <a href="{{ path('owner_new') }}"
+        <a href="{{ path('customer_new') }}"
             class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-            New owner
+            New customer
         </a>
     </div>
 
@@ -22,61 +21,41 @@
                 <thead class="bg-gray-50 dark:bg-white/5">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                            Name</th>
+                            Company</th>
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                             Email</th>
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                             Phone</th>
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                             SIRENE</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">APE
-                        </th>
                         <th class="px-6 py-3"></th>
                     </tr>
                 </thead>
-
                 <tbody class="divide-y divide-gray-100 dark:divide-white/10">
-                    {% for o in owners %}
+                    {% for c in customers %}
                     <tr class="hover:bg-gray-50/80 dark:hover:bg-white/5">
                         <td class="whitespace-nowrap px-6 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {{ o.firstname }} {{ o.lastname }}
-                            {% if o.companyName is defined and o.companyName %}
-                            <span
-                                class="ml-2 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700 ring-1 ring-inset ring-gray-300 dark:bg-white/10 dark:text-gray-200 dark:ring-white/10">
-                                {{ o.companyName }}
-                            </span>
-                            {% endif %}
+                            {{ c.companyName }}
                         </td>
-
                         <td class="whitespace-nowrap px-6 py-3 text-sm">
-                            {% if o.email %}
-                            <a href="mailto:{{ o.email }}"
-                                class="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">{{ o.email }}</a>
+                            {% if c.email %}
+                            <a href="mailto:{{ c.email }}"
+                                class="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">{{ c.email }}</a>
                             {% else %}—{% endif %}
                         </td>
-
-                        <td class="whitespace-nowrap px-6 py-3 text-sm text-gray-700 dark:text-gray-300">
-                            {{ o.phone ?: '—' }}
-                        </td>
-
-                        <td class="whitespace-nowrap px-6 py-3 text-sm text-gray-700 dark:text-gray-300">
-                            {{ o.sirene ?: '—' }}
-                        </td>
-
-                        <td class="whitespace-nowrap px-6 py-3 text-sm text-gray-700 dark:text-gray-300">
-                            {{ o.ape ?: '—' }}
-                        </td>
-
+                        <td class="whitespace-nowrap px-6 py-3 text-sm text-gray-700 dark:text-gray-300">{{ c.phone ?:
+                            '—' }}</td>
+                        <td class="whitespace-nowrap px-6 py-3 text-sm text-gray-700 dark:text-gray-300">{{ c.sirene ?:
+                            '—' }}</td>
                         <td class="whitespace-nowrap px-6 py-3 text-right text-sm">
-                            <a href="{{ path('owner_show', {id: o.id}) }}"
+                            <a href="{{ path('customer_show', {id: c.id}) }}"
                                 class="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">View</a>
                         </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6" class="px-6 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
-                            No owners yet.
-                        </td>
+                        <td colspan="5" class="px-6 py-6 text-center text-sm text-gray-500 dark:text-gray-400">No
+                            customers yet.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
