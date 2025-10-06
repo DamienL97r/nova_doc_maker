@@ -1,130 +1,174 @@
 {# templates/form/tw_theme.html.twig #}
+{% use 'form_div_layout.html.twig' %}
 
-{%- block form_row -%}
-<div class="{{ row_attr.class|default('') }}">
-    {{- form_label(form, null, {
-    label_attr: { class: (label_attr.class|default('') ~ ' block text-sm/6 font-medium text-gray-900
-    dark:text-white')|trim }
-    }) -}}
-    <div class="mt-2">
-        {{- form_widget(form, {
-        attr: {
-        class: (attr.class|default('') ~ ' block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline
-        outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2
-        focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white
-        dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500')|trim
-        }
-        }) -}}
-        {{- block('form_errors') -}}
+{# =========================
+ROW & ERRORS
+========================= #}
+{% block form_row -%}
+{%- set row_class = (row_attr.class|default('') ~ ' sm:col-span-3')|trim -%}
+{%- set row_attr = row_attr|merge({class: row_class}) -%}
+<div {{ block('attributes') }}>
+    {{- form_label(form) -}}
+    <div class="mt-1">
+        {{- form_widget(form) -}}
     </div>
+    {{- form_errors(form) -}}
+    {%- if help is not empty -%}
+    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ help|raw }}</p>
+    {%- endif -%}
 </div>
 {%- endblock %}
 
-{# Libellé #}
-{%- block form_label -%}
-{% if label is not same as(false) -%}
-{% if not compound -%}
-{% set label_attr = label_attr|merge({for: id}) %}
+{% block form_errors -%}
+{%- if errors|length > 0 -%}
+<ul class="mt-2 space-y-1 text-sm text-rose-600 dark:text-rose-400">
+    {%- for error in errors -%}
+    <li>{{ error.message }}</li>
+    {%- endfor -%}
+</ul>
 {%- endif -%}
-{% set classes = (label_attr.class|default('') ~ ' block text-sm/6 font-medium text-gray-900 dark:text-white')|trim %}
-{% set label_attr = label_attr|merge({ class: classes }) %}
-<label{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
-    {{- (label is empty ? name|humanize : label)|trans({}, translation_domain) -}}
-    </label>
-    {%- endif -%}
-    {%- endblock %}
+{%- endblock %}
 
-    {# Erreurs #}
-    {%- block form_errors -%}
-    {% set errs = form is defined ? form.vars.errors : [] %}
-    {% if errs|length > 0 %}
-    <ul class="mt-1 text-sm text-red-600 dark:text-red-400 space-y-1">
-        {% for error in errs %}
-        <li>{{ error.message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {%- endblock %}
+{# =========================
+LABELS
+========================= #}
+{% block form_label -%}
+{%- if label is not same as(false) -%}
+{%- set label_attr = label_attr|merge({
+class: (label_attr.class|default('') ~ ' block text-sm font-medium text-gray-900 dark:text-gray-100')|trim
+}) -%}
+{{- parent() -}}
+{%- endif -%}
+{%- endblock %}
 
-    {# Inputs simples (text, email, number, date …) #}
-    {%- block form_widget_simple -%}
-    {%- set type = type|default('text') -%}
-    <input type="{{ type }}" {{ block('widget_attributes') }} class="{{ attr.class|default('') }}" {% if value is not
-        empty %}value="{{ value }}" {% endif %}>
-    {%- endblock %}
+{# =========================
+TEXT / INPUTS
+========================= #}
+{% block form_widget_simple -%}
+{% if type is defined and type == 'hidden' %}
+{{ parent() }}
+{% else %}
+{% set attr = attr|merge({
+class: (attr.class|default('') ~ ' block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline
+outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2
+focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10
+dark:placeholder:text-gray-500 dark:focus:outline-indigo-500')|trim
+}) %}
+{{- parent() -}}
+{% endif %}
+{%- endblock %}
 
-    {# Textarea #}
-    {%- block textarea_widget -%}
-    <textarea {{ block('widget_attributes') }} class="{{ attr.class|default('') }}"
-        rows="{{ attr.rows|default(3) }}">{{ value }}</textarea>
-    {%- endblock %}
+{% block textarea_widget -%}
+{% set attr = attr|merge({
+class: (attr.class|default('') ~ ' block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1
+-outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2
+focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10
+dark:placeholder:text-gray-500 dark:focus:outline-indigo-500')|trim
+}) %}
+{{- parent() -}}
+{%- endblock %}
 
-    {# Select (choice collapsed) avec chevron #}
-    {%- block choice_widget_collapsed -%}
-    <div class="relative grid grid-cols-1">
-        <select {{ block('widget_attributes') }}
-            class="{{ (attr.class|default('') ~ ' col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pl-3 pr-8 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:focus:outline-indigo-500')|trim }}"
-            {% if multiple %}multiple="multiple" {% endif %} {% if required and placeholder is none and not
-            placeholder_in_choices and not multiple and (attr.size is not defined or attr.size <=1) %} {{- ' required'
-            -}} {% endif %}>
-            {% if placeholder is not none %}
-            <option value="" {% if required and value is empty %} selected="selected" {% endif %}>{{ placeholder != '' ?
-                (placeholder|trans({}, translation_domain)) : '' }}</option>
-            {% endif %}
-            {% if preferred_choices|length > 0 %}
+{# =========================
+CHOICES (SELECT)
+========================= #}
+{% block choice_widget_collapsed -%}
+{# On stylise le <select> natif pour ressembler à ton bouton dropdown #}
+
+    {% set select_classes = '
+    block w-full appearance-none rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900
+    shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2
+    focus:ring-indigo-600 dark:bg-white/10 dark:text-white dark:shadow-none dark:ring-white/5
+    dark:hover:bg-white/20
+    ' %}
+
+    {# on fusionne avec d’éventuelles classes existantes #}
+    {% set attr = attr|merge({ class: (attr.class|default('') ~ ' ' ~ select_classes)|trim }) %}
+
+    <div class="relative w-full">
+        <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple" {% endif %}
+            class="{{ attr.class }}">
+            {%- if placeholder is not null -%}
+            <option value="" {%- if required and (value is empty) and (not placeholder_in_choices) and (not multiple)
+                -%} selected="selected" {%- endif -%}>
+                {{ placeholder is same as('') ? '' : (
+                translation_domain is same as(false)
+                ? placeholder
+                : placeholder|trans({}, translation_domain)
+                ) }}
+            </option>
+            {%- endif -%}
+
+            {# IMPORTANT : transmettre "options" (et non "choices") #}
+            {%- if preferred_choices|length > 0 -%}
+            {% with { options: preferred_choices } %}
             {{ block('choice_widget_options') }}
-            {% if choices|length > 0 and separator is not none %}
+            {% endwith %}
+            {%- if choices|length > 0 and separator is not null -%}
             <option disabled="disabled">{{ separator }}</option>
-            {% endif %}
-            {% endif %}
+            {%- endif -%}
+            {%- endif -%}
+
+            {% with { options: choices } %}
             {{ block('choice_widget_options') }}
+            {% endwith %}
         </select>
 
-        {# Chevron #}
-        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"
-            class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4 dark:text-gray-400">
-            <path
-                d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z"
-                fill-rule="evenodd" clip-rule="evenodd" />
+        {# Chevron à droite, non cliquable #}
+        <svg viewBox="0 0 20 20" aria-hidden="true"
+            class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-400">
+            <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
+                d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" />
         </svg>
     </div>
     {%- endblock %}
 
-    {# Checkboxes #}
-    {%- block checkbox_widget -%}
-    <input type="checkbox" {{ block('widget_attributes') }}
-        class="{{ (attr.class|default('') ~ ' appearance-none rounded border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto dark:bg-white/5 dark:border-white/10 dark:checked:bg-indigo-500 dark:checked:border-indigo-500')|trim }}"
-        {% if value is defined %}value="{{ value }}" {% endif %} {% if checked %}checked="checked" {% endif %} />
-    {%- endblock %}
+    {# On laisse le core générer les <option> #}
+        {% block choice_widget_options %}
+        {{ parent() }}
+        {% endblock %}
 
-    {# Radios #}
-    {%- block radio_widget -%}
-    <input type="radio" {{ block('widget_attributes') }}
-        class="{{ (attr.class|default('') ~ ' relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto dark:bg-white/5 dark:border-white/10 dark:checked:bg-indigo-500 dark:checked:border-indigo-500')|trim }}"
-        {% if value is defined %}value="{{ value }}" {% endif %} {% if checked %}checked="checked" {% endif %} />
-    {%- endblock %}
+        {# =========================
+        CHECKBOX / RADIO
+        ========================= #}
+        {% block checkbox_widget -%}
+        {%- set attr = attr|merge({
+        class: (attr.class|default('') ~ ' h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-2
+        focus:ring-indigo-600 dark:border-white/10 dark:bg-white/5 dark:text-indigo-500')|trim
+        }) -%}
+        {{- parent() -}}
+        {%- endblock %}
 
-    {# Groupes de cases/radios (expanded) #}
-    {%- block choice_widget_expanded -%}
-    <div {{ block('widget_container_attributes') }} class="space-y-3 {{ attr.class|default('') }}">
-        {% for child in form %}
-        <div class="flex gap-3">
-            <div class="flex h-6 shrink-0 items-center">
-                {{- form_widget(child) -}}
-            </div>
-            <div class="text-sm/6">
-                {{- form_label(child, null, { label_attr: { class: 'font-medium text-gray-900 dark:text-white' } }) -}}
-                {% if child.vars.help is defined and child.vars.help %}
-                <p class="text-gray-500 dark:text-gray-400">{{ child.vars.help }}</p>
-                {% endif %}
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    {%- endblock %}
+        {% block radio_widget -%}
+        {%- set attr = attr|merge({
+        class: (attr.class|default('') ~ ' h-4 w-4 border-gray-300 text-indigo-600 focus:ring-2 focus:ring-indigo-600
+        dark:border-white/10 dark:bg-white/5 dark:text-indigo-500')|trim
+        }) -%}
+        {{- parent() -}}
+        {%- endblock %}
 
-    {# Fichier #}
-    {%- block file_widget -%}
-    <input type="file" {{ block('widget_attributes') }}
-        class="{{ (attr.class|default('') ~ ' block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:focus:outline-indigo-500')|trim }}">
-    {%- endblock %}
+        {# =========================
+        FILE
+        ========================= #}
+        {% block file_widget -%}
+        {% set attr = attr|merge({
+        class: (attr.class|default('') ~ ' block w-full text-sm text-gray-900 file:mr-4 file:rounded-md file:border-0
+        file:bg-indigo-600 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white
+        hover:file:bg-indigo-500 dark:text-gray-200 dark:file:bg-indigo-500 dark:hover:file:bg-indigo-400')|trim
+        }) %}
+        {{- parent() -}}
+        {%- endblock %}
+
+        {# =========================
+        BUTTONS
+        ========================= #}
+        {% block button_widget -%}
+        {% set attr = attr|merge({
+        class: (attr.class|default('') ~ ' inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm
+        font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2
+        focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:hover:bg-indigo-400')|trim
+        }) %}
+        {{- parent() -}}
+        {%- endblock %}
+
+        {% block submit_widget %}{{ block('button_widget') }}{% endblock %}
+        {% block reset_widget %}{{ block('button_widget') }}{% endblock %}

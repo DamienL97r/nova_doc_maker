@@ -1,0 +1,182 @@
+{% extends 'base.html.twig' %}
+{% block title %}Quote • {{ quote.number }}{% endblock %}
+
+{% block body %}
+<div class="relative isolate">
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div class="absolute left-1/2 top-[-6rem] -translate-x-1/2 opacity-40 blur-3xl">
+            <div style="clip-path: polygon(100% 38.5%, 82.6% 100%, 60.2% 37.7%, 52.4% 32.1%, 47.5% 41.8%, 45.2% 65.6%, 27.5% 23.4%, 0.1% 35.3%, 17.9% 0%, 27.7% 23.4%, 76.2% 2.5%, 74.2% 56%, 100% 38.5%)"
+                class="aspect-[1154/678] w-[72rem] bg-gradient-to-br from-indigo-400/50 to-fuchsia-400/50 dark:from-indigo-600/40 dark:to-fuchsia-600/40">
+            </div>
+        </div>
+    </div>
+
+    <header class="mx-auto max-w-7xl px-4 pt-10 sm:px-6 lg:px-8">
+        <nav class="text-sm text-gray-500 dark:text-gray-400">
+            <a href="{{ path('quote_index') }}" class="hover:text-gray-900 dark:hover:text-white">Quotes</a>
+            <span class="px-2">/</span>
+            <span class="text-gray-900 dark:text-gray-100 font-medium">#{{ quote.number }}</span>
+        </nav>
+
+        <div class="mt-6 flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
+                    {{ quote.title }}
+                </h1>
+                <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
+                    Issued on <time datetime="{{ quote.issueDate|date('Y-m-d') }}">{{ quote.issueDate|date('Y-m-d')
+                        }}</time> • Valid until
+                    <time datetime="{{ quote.validUntil|date('Y-m-d') }}">{{ quote.validUntil|date('Y-m-d') }}</time>
+                </p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                {% set badge = {
+                'Draft': 'bg-gray-50 text-gray-700 ring-gray-600/20 dark:bg-white/10 dark:text-gray-200
+                dark:ring-white/10',
+                'Sent': 'bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-300
+                dark:ring-sky-400/30',
+                'Accepted': 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10
+                dark:text-emerald-300 dark:ring-emerald-400/30',
+                'Declined': 'bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-500/10 dark:text-rose-300
+                dark:ring-rose-400/30',
+                'Expired': 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/10 dark:text-amber-300
+                dark:ring-amber-400/30'
+                }[quote.status|default('Draft')] ?? 'bg-gray-50 text-gray-700 ring-gray-600/20 dark:bg-white/10
+                dark:text-gray-200 dark:ring-white/10' %}
+
+                <span
+                    class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset {{ badge }}">
+                    {{ quote.status }}
+                </span>
+
+                <a href="{{ path('quote_edit', {id: quote.id}) }}"
+                    class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:ring-white/20 dark:hover:bg-white/15">
+                    Edit
+                </a>
+                <form method="post" action="{{ path('quote_delete', {id: quote.id}) }}"
+                    onsubmit="return confirm('Delete this quote?');" class="m-0">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete_quote_' ~ quote.id) }}">
+                    <button type="submit"
+                        class="rounded-md bg-rose-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-rose-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600">
+                        Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div class="grid gap-6 lg:grid-cols-3">
+            <section
+                class="lg:col-span-2 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5 dark:bg-white/5 dark:ring-white/10">
+                <h2 class="text-base font-semibold text-gray-900 dark:text-white">Summary</h2>
+                <dl class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div class="rounded-lg p-4 ring-1 ring-inset ring-gray-200 dark:ring-white/10">
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Quote number</dt>
+                        <dd class="mt-1 text-gray-900 dark:text-gray-100">#{{ quote.number }}</dd>
+                    </div>
+
+                    <div class="rounded-lg p-4 ring-1 ring-inset ring-gray-200 dark:ring-white/10">
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Customer</dt>
+                        <dd class="mt-1 text-gray-900 dark:text-gray-100">
+                            {% if quote.customer %}{{ quote.customer.companyName }}{% else %}—{% endif %}
+                        </dd>
+                    </div>
+
+                    <div class="rounded-lg p-4 ring-1 ring-inset ring-gray-200 dark:ring-white/10">
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Owner (issuer)</dt>
+                        <dd class="mt-1 text-gray-900 dark:text-gray-100">
+                            {% if quote.owner %}{{ quote.owner.firstname }} {{ quote.owner.lastname }} — {{
+                            quote.owner.companyName }}{% else %}—{% endif %}
+                        </dd>
+                    </div>
+
+                    <div class="rounded-lg p-4 ring-1 ring-inset ring-gray-200 dark:ring-white/10">
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Validity</dt>
+                        <dd class="mt-1 text-gray-900 dark:text-gray-100">
+                            {{ quote.issueDate ? quote.issueDate|date('Y-m-d') : '—' }} → {{ quote.validUntil ?
+                            quote.validUntil|date('Y-m-d') : '—' }}
+                        </dd>
+                    </div>
+                </dl>
+
+                <h3 class="mt-8 text-base font-semibold text-gray-900 dark:text-white">Totals</h3>
+                <div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-3">
+                    <div class="rounded-lg p-4 ring-1 ring-inset ring-gray-200 dark:ring-white/10">
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Subtotal</dt>
+                        <dd class="mt-1 text-gray-900 dark:text-gray-100">{{ quote.subTotal ?? '—' }}</dd>
+                    </div>
+                    <div class="rounded-lg p-4 ring-1 ring-inset ring-gray-200 dark:ring-white/10">
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Tax</dt>
+                        <dd class="mt-1 text-gray-900 dark:text-gray-100">{{ quote.taxTotal ?? '—' }}</dd>
+                    </div>
+                    <div class="rounded-lg p-4 ring-1 ring-inset ring-gray-200 dark:ring-white/10">
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Total</dt>
+                        <dd class="mt-1 font-semibold text-gray-900 dark:text-gray-100">{{ quote.total ?? '—' }}</dd>
+                    </div>
+                </div>
+
+                <h3 class="mt-8 text-base font-semibold text-gray-900 dark:text-white">Items</h3>
+                {% if quote.items|length > 0 %}
+                <div class="mt-4 overflow-hidden rounded-lg ring-1 ring-gray-200 dark:ring-white/10">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-white/10">
+                        <thead class="bg-gray-50 dark:bg-white/5">
+                            <tr>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                    #</th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                    Item</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-white/10">
+                            {% for it in quote.items %}
+                            <tr class="hover:bg-gray-50/80 dark:hover:bg-white/5">
+                                <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">{{
+                                    it.id ?? loop.index }}</td>
+                                <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                                    {{ it is defined ? it : 'Item' }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">No items.</p>
+                {% endif %}
+            </section>
+
+            <aside class="space-y-6">
+                <div
+                    class="rounded-2xl bg-gray-50 p-6 shadow-sm ring-1 ring-gray-900/5 dark:bg-white/5 dark:ring-white/10">
+                    <h3 class="text-sm/6 font-semibold text-gray-900 dark:text-white">Actions</h3>
+                    <div class="mt-4 grid gap-3">
+                        <a href="{{ path('quote_edit', {id: quote.id}) }}"
+                            class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                            Edit quote
+                        </a>
+                        <a href="{{ path('quote_index') }}"
+                            class="inline-flex items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:ring-white/20 dark:hover:bg-white/15">
+                            Back to list
+                        </a>
+                    </div>
+                </div>
+
+                <div
+                    class="rounded-2xl bg-gray-50 p-6 shadow-sm ring-1 ring-gray-900/5 dark:bg-white/5 dark:ring-white/10">
+                    <h3 class="text-sm/6 font-semibold text-gray-900 dark:text-white">Meta</h3>
+                    <dl class="mt-4 space-y-3 text-sm">
+                        <div class="flex justify-between gap-4">
+                            <dt class="text-gray-500 dark:text-gray-400">Quote ID</dt>
+                            <dd class="font-medium text-gray-900 dark:text-gray-100">#{{ quote.id }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </aside>
+        </div>
+    </main>
+</div>
+{% endblock %}
