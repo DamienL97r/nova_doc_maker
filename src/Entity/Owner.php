@@ -6,51 +6,72 @@ use App\Repository\OwnerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
+use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OwnerRepository::class)]
+#[ORM\Table(name: 'owner')]
+#[UniqueEntity('sirene')]
+#[UniqueEntity('email')]
 class Owner
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: UlidType::NAME)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UlidGenerator::class)]
+    private ?Ulid $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $lastname = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 9, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Regex(pattern: '/^\d{9}$/')]
     private ?string $sirene = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 5)]
+    #[Assert\NotBlank]
+    #[Assert\Regex(pattern: '/^\d{4}[A-Z]$/')]
     private ?string $ape = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Email]
     private ?string $email = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 25)]
+    #[Assert\NotBlank]
+    #[Assert\Regex(
+        pattern: '/^(?:\+33|0)[1-9]\d{8}$|^\+\d{6,20}$/',
+        message: 'Numéro de téléphone invalide.'
+    )]
     private ?string $phone = null;
 
-    /**
-     * @var Collection<int, Quote>
-     */
-    #[ORM\OneToMany(targetEntity: Quote::class, mappedBy: 'owner')]
-    private Collection $quotes;
-
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $companyName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
+
+    /** @var Collection<int, Quote> */
+    #[ORM\OneToMany(targetEntity: Quote::class, mappedBy: 'owner')]
+    private Collection $quotes;
 
     public function __construct()
     {
         $this->quotes = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Ulid
     {
         return $this->id;
     }
@@ -59,11 +80,9 @@ class Owner
     {
         return $this->firstname;
     }
-
     public function setFirstname(string $firstname): static
     {
         $this->firstname = $firstname;
-
         return $this;
     }
 
@@ -71,11 +90,9 @@ class Owner
     {
         return $this->lastname;
     }
-
     public function setLastname(string $lastname): static
     {
         $this->lastname = $lastname;
-
         return $this;
     }
 
@@ -83,11 +100,9 @@ class Owner
     {
         return $this->sirene;
     }
-
     public function setSirene(string $sirene): static
     {
         $this->sirene = $sirene;
-
         return $this;
     }
 
@@ -95,11 +110,9 @@ class Owner
     {
         return $this->ape;
     }
-
-    public function setApe(?string $ape): static
+    public function setApe(string $ape): static
     {
         $this->ape = $ape;
-
         return $this;
     }
 
@@ -107,11 +120,9 @@ class Owner
     {
         return $this->email;
     }
-
-    public function setEmail(?string $email): static
+    public function setEmail(string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
@@ -119,17 +130,38 @@ class Owner
     {
         return $this->phone;
     }
-
-    public function setPhone(?string $phone): static
+    public function setPhone(string $phone): static
     {
         $this->phone = $phone;
-
         return $this;
     }
 
-    /**
-     * @return Collection<int, Quote>
-     */
+    public function getCompanyName(): ?string
+    {
+        return $this->companyName;
+    }
+    public function setCompanyName(string $companyName): static
+    {
+        $this->companyName = $companyName;
+        return $this;
+    }
+
+    public function getLogo(): ?string
+    {
+        return $this->logo;
+    }
+    public function setLogo(?string $logo): static
+    {
+        $this->logo = $logo;
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return trim(($this->firstname ?? '') . ' ' . ($this->lastname ?? '')) ?: 'Owner #' . ($this->id?->toBase32() ?? '');
+    }
+
+    /** @return Collection<int, Quote> */
     public function getQuotes(): Collection
     {
         return $this->quotes;
@@ -141,48 +173,14 @@ class Owner
             $this->quotes->add($quote);
             $quote->setOwner($this);
         }
-
         return $this;
     }
 
     public function removeQuote(Quote $quote): static
     {
-        if ($this->quotes->removeElement($quote)) {
-            // set the owning side to null (unless already changed)
-            if ($quote->getOwner() === $this) {
-                $quote->setOwner(null);
-            }
+        if ($this->quotes->removeElement($quote) && $quote->getOwner() === $this) {
+            $quote->setOwner(null);
         }
-
-        return $this;
-    }
-
-    public function __toString(): string
-    {
-        return trim(($this->firstname ?? '') . ' ' . ($this->lastname ?? '')) ?: 'Owner #' . $this->id;
-    }
-
-    public function getCompanyName(): ?string
-    {
-        return $this->companyName;
-    }
-
-    public function setCompanyName(string $companyName): static
-    {
-        $this->companyName = $companyName;
-
-        return $this;
-    }
-
-    public function getLogo(): ?string
-    {
-        return $this->logo;
-    }
-
-    public function setLogo(?string $logo): static
-    {
-        $this->logo = $logo;
-
         return $this;
     }
 }
