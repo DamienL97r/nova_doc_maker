@@ -7,51 +7,73 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
+use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: QuoteRepository::class)]
+#[UniqueEntity('number')]
 class Quote
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: UlidType::NAME)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UlidGenerator::class)]
+    private ?Ulid $id = null;
 
-    #[ORM\Column(length: 40)]
+    #[ORM\Column(length: 40, unique: true)]
+    #[Assert\NotBlank]
     private ?string $number = null;
 
     #[ORM\Column(length: 180)]
+    #[Assert\NotBlank]
     private ?string $title = null;
 
     #[ORM\Column]
+    #[Assert\NotNull]
+    #[Assert\LessThanOrEqual('today')]
     private ?\DateTimeImmutable $issueDate = null;
 
     #[ORM\Column]
+    #[Assert\NotNull]
+    #[Assert\GreaterThan(propertyPath: 'issueDate')]
     private ?\DateTimeImmutable $validUntil = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 20)]
+    #[Assert\NotBlank]
+    #[Assert\Choice(choices: ['draft', 'sent', 'accepted', 'declined', 'expired'])]
     private ?string $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'quotes')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull]
     private ?Customer $customer = null;
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    private ?string $subTotal = null;
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    private ?string $taxTotal = null;
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    private ?string $total = null;
 
     #[ORM\ManyToOne(inversedBy: 'quotes')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull]
     private ?Owner $owner = null;
 
-    /**
-     * @var Collection<int, QuoteItem>
-     */
-    #[ORM\OneToMany(targetEntity: QuoteItem::class, mappedBy: 'quote')]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Assert\NotNull]
+    #[Assert\GreaterThanOrEqual('0')]
+    private ?string $subTotal = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Assert\NotNull]
+    #[Assert\GreaterThanOrEqual('0')]
+    private ?string $taxTotal = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Assert\NotNull]
+    #[Assert\GreaterThanOrEqual('0')]
+    private ?string $total = null;
+
+    /** @var Collection<int, QuoteItem> */
+    #[ORM\OneToMany(targetEntity: QuoteItem::class, mappedBy: 'quote', cascade: ['persist'], orphanRemoval: true)]
+    #[Assert\Count(min: 1)]
     private Collection $items;
 
     public function __construct()
@@ -60,7 +82,7 @@ class Quote
         $this->items = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Ulid
     {
         return $this->id;
     }
@@ -69,11 +91,9 @@ class Quote
     {
         return $this->number;
     }
-
     public function setNumber(string $number): static
     {
         $this->number = $number;
-
         return $this;
     }
 
@@ -81,11 +101,9 @@ class Quote
     {
         return $this->title;
     }
-
     public function setTitle(string $title): static
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -93,11 +111,9 @@ class Quote
     {
         return $this->issueDate;
     }
-
     public function setIssueDate(\DateTimeImmutable $issueDate): static
     {
         $this->issueDate = $issueDate;
-
         return $this;
     }
 
@@ -105,11 +121,9 @@ class Quote
     {
         return $this->validUntil;
     }
-
     public function setValidUntil(\DateTimeImmutable $validUntil): static
     {
         $this->validUntil = $validUntil;
-
         return $this;
     }
 
@@ -117,11 +131,9 @@ class Quote
     {
         return $this->status;
     }
-
     public function setStatus(string $status): static
     {
         $this->status = $status;
-
         return $this;
     }
 
@@ -129,47 +141,9 @@ class Quote
     {
         return $this->customer;
     }
-
     public function setCustomer(?Customer $customer): static
     {
         $this->customer = $customer;
-
-        return $this;
-    }
-
-    public function getSubTotal(): ?string
-    {
-        return $this->subTotal;
-    }
-
-    public function setSubTotal(?string $subTotal): static
-    {
-        $this->subTotal = $subTotal;
-
-        return $this;
-    }
-
-    public function getTaxTotal(): ?string
-    {
-        return $this->taxTotal;
-    }
-
-    public function setTaxTotal(?string $taxTotal): static
-    {
-        $this->taxTotal = $taxTotal;
-
-        return $this;
-    }
-
-    public function getTotal(): ?string
-    {
-        return $this->total;
-    }
-
-    public function setTotal(?string $total): static
-    {
-        $this->total = $total;
-
         return $this;
     }
 
@@ -177,17 +151,43 @@ class Quote
     {
         return $this->owner;
     }
-
     public function setOwner(?Owner $owner): static
     {
         $this->owner = $owner;
-
         return $this;
     }
 
-    /**
-     * @return Collection<int, QuoteItem>
-     */
+    public function getSubTotal(): ?string
+    {
+        return $this->subTotal;
+    }
+    public function setSubTotal(string $subTotal): static
+    {
+        $this->subTotal = $subTotal;
+        return $this;
+    }
+
+    public function getTaxTotal(): ?string
+    {
+        return $this->taxTotal;
+    }
+    public function setTaxTotal(string $taxTotal): static
+    {
+        $this->taxTotal = $taxTotal;
+        return $this;
+    }
+
+    public function getTotal(): ?string
+    {
+        return $this->total;
+    }
+    public function setTotal(string $total): static
+    {
+        $this->total = $total;
+        return $this;
+    }
+
+    /** @return Collection<int, QuoteItem> */
     public function getItems(): Collection
     {
         return $this->items;
@@ -199,19 +199,14 @@ class Quote
             $this->items->add($item);
             $item->setQuote($this);
         }
-
         return $this;
     }
 
     public function removeItem(QuoteItem $item): static
     {
-        if ($this->items->removeElement($item)) {
-            // set the owning side to null (unless already changed)
-            if ($item->getQuote() === $this) {
-                $item->setQuote(null);
-            }
+        if ($this->items->removeElement($item) && $item->getQuote() === $this) {
+            $item->setQuote(null);
         }
-
         return $this;
     }
 }
