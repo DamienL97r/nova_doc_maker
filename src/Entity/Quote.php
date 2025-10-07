@@ -43,7 +43,7 @@ class Quote
 
     #[ORM\Column(length: 20)]
     #[Assert\NotBlank]
-    #[Assert\Choice(choices: ['draft', 'sent', 'accepted', 'declined', 'expired'])]
+    #[Assert\Choice(choices: ['Draft', 'Sent', 'Accepted', 'Declined', 'Expired'])]
     private ?string $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'quotes')]
@@ -73,7 +73,7 @@ class Quote
 
     /** @var Collection<int, QuoteItem> */
     #[ORM\OneToMany(targetEntity: QuoteItem::class, mappedBy: 'quote', cascade: ['persist'], orphanRemoval: true)]
-    #[Assert\Count(min: 1)]
+    #[Assert\Count(min: 0)]
     private Collection $items;
 
     public function __construct()
