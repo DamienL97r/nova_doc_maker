@@ -71,8 +71,8 @@ class Quote
     #[Assert\GreaterThanOrEqual('0')]
     private ?string $total = null;
 
-    /** @var Collection<int, QuoteItem> */
-    #[ORM\OneToMany(targetEntity: QuoteItem::class, mappedBy: 'quote', cascade: ['persist'], orphanRemoval: true)]
+    /** @var Collection<int, Product> */
+    #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'quote', cascade: ['persist'], orphanRemoval: true)]
     #[Assert\Count(min: 0)]
     private Collection $items;
 
@@ -193,7 +193,7 @@ class Quote
         return $this->items;
     }
 
-    public function addItem(QuoteItem $item): static
+    public function addItem(Product $item): static
     {
         if (!$this->items->contains($item)) {
             $this->items->add($item);
@@ -202,7 +202,7 @@ class Quote
         return $this;
     }
 
-    public function removeItem(QuoteItem $item): static
+    public function removeItem(Product $item): static
     {
         if ($this->items->removeElement($item) && $item->getQuote() === $this) {
             $item->setQuote(null);

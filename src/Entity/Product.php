@@ -2,17 +2,21 @@
 
 namespace App\Entity;
 
-use App\Repository\QuoteItemRepository;
+use App\Repository\ProductRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
+use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Component\Uid\Ulid;
 
-#[ORM\Entity(repositoryClass: QuoteItemRepository::class)]
-class QuoteItem
+#[ORM\Entity(repositoryClass: ProductRepository::class)]
+class Product
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: UlidType::NAME)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UlidGenerator::class)]
+    private ?Ulid $id = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
@@ -36,7 +40,7 @@ class QuoteItem
     #[ORM\JoinColumn(nullable: false)]
     private ?Quote $quote = null;
 
-    public function getId(): ?int
+    public function getId(): ?Ulid
     {
         return $this->id;
     }
