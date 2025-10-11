@@ -128,4 +128,18 @@ class Product
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        // Adapte si ton entité n’a pas ces champs
+        $title = (string) ($this->getTitle() ?? 'Produit');
+        $quantity    = $this->getQuantity();
+        $unitPrice   = $this->getUnitPrice();
+
+        // Protège contre null
+        $quantityString  = $quantity !== null ? number_format((float)$quantity, 2, ',', ' ') : '—';
+        $unitPriceString = $unitPrice !== null ? number_format((float)$unitPrice, 2, ',', ' ') : '—';
+
+        return sprintf('%s (%s × %s € HT)', $title, $quantityString, $unitPriceString);
+    }
 }
