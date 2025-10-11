@@ -68,3 +68,10 @@ php bin/console asset-map:compile
 
 npm run build
 ```
+
+## Fixtures
+
+Generate fixtures
+```bash
+php bin/console d:f:l
+```
