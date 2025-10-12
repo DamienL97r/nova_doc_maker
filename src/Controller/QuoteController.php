@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Quote;
 use App\Form\QuoteType;
+use App\Service\PdfExporter;
 use Doctrine\ORM\EntityManagerInterface as EM;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -87,5 +88,25 @@ class QuoteController extends AbstractController
             $this->addFlash('success', 'Quote deleted successfully.');
         }
         return $this->redirectToRoute('quote_index');
+    }
+
+    #[Route('/{id}/pdf', name: 'quote_pdf', methods: ['GET'])]
+    public function pdf(Quote $quote, PdfExporter $pdf, Request $request): Response
+    {
+        $download = $request->query->getBoolean('download', true);
+
+        return $pdf->renderPdfResponse(
+            'quote/pdf.html.twig',
+            ['quote' => $quote],
+            sprintf('%s_%s', $quote->getNumber() ?? 'quote', $quote->getId()),
+            $download
+        );
+    }
+
+    // (optionnel) prévisualisation HTML du même template
+    #[Route('/{id}/pdf-preview', name: 'quote_pdf_preview', methods: ['GET'])]
+    public function preview(Quote $quote): Response
+    {
+        return $this->render('quote/pdf.html.twig', ['quote' => $quote]);
     }
 }

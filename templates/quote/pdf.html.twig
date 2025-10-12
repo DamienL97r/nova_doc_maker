@@ -1,0 +1,175 @@
+{% set title = 'Quote ' ~ (quote.number ?? quote.id) %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+
+    {# Dompdf supporte un sous-ensemble CSS : pas de flex complexes/position fixed.
+    Préfère tableaux/grilles simples. #}
+    <style>
+        @page {
+            margin: 15mm 12mm 18mm 12mm;
+        }
+
+        body {
+            font-family: DejaVu Sans, Arial, sans-serif;
+            color: #0f172a;
+            font-size: 12px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin: 0 0 6px;
+        }
+
+        .muted {
+            color: #64748b;
+        }
+
+        .grid2 {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 12px 0;
+        }
+
+        .box {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .mt-12 {
+            margin-top: 12px;
+        }
+
+        .mt-16 {
+            margin-top: 16px;
+        }
+
+        .mt-24 {
+            margin-top: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+
+        th {
+            text-align: left;
+            font-weight: 600;
+            background: #f6f8fa;
+        }
+
+        tfoot td {
+            border-top: 1px solid #cbd5e1;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .small {
+            font-size: 11px;
+        }
+
+        .header {
+            margin-bottom: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Quote {{ quote.number }}</h1>
+        <div class="muted small">
+            Issued: {{ quote.issueDate|date('Y-m-d') }} · Valid until: {{ quote.validUntil|date('Y-m-d') }}
+        </div>
+    </div>
+
+    <table class="grid2">
+        <tr>
+            <td class="box" style="width:50%">
+                <h3>Customer</h3>
+                <div>{{ quote.customer.companyName }}</div>
+            </td>
+            <td class="box" style="width:50%">
+                <h3>Owner (issuer)</h3>
+                <div>
+                    {{ quote.owner.firstname }} {{ quote.owner.lastname }}<br />
+                    {{ quote.owner.companyName }}
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="mt-16">
+        <h3>{{ quote.title }}</h3>
+    </div>
+
+    <div class="mt-12">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:55%">Item</th>
+                    <th class="right" style="width:15%">Qty</th>
+                    <th class="right" style="width:15%">Unit (excl. tax)</th>
+                    <th class="right" style="width:15%">Line total (incl. tax)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in quote.items %}
+                {% set qty = p.quantity ?: 0 %}
+                {% set up = p.unitPrice ?: 0 %}
+                {% set rate = p.taxRate ?: 0 %}
+                {% set line_ht = (qty * up) %}
+                {% set line_tax = (line_ht * rate) %}
+                {% set line_ttc = (line_ht + line_tax) %}
+                <tr>
+                    <td><strong>{{ p.title }}</strong></td>
+                    <td class="right">{{ qty|number_format(2, ',', ' ') }}</td>
+                    <td class="right">{{ up|number_format(2, ',', ' ') }} €</td>
+                    <td class="right">{{ line_ttc|number_format(2, ',', ' ') }} €</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="small muted">No items.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="right"><strong>Subtotal (excl. tax)</strong></td>
+                    <td class="right"><strong>{{ quote.subTotal|default('0.00')|number_format(2, ',', ' ') }} €</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="right">Tax</td>
+                    <td class="right">{{ quote.taxTotal|default('0.00')|number_format(2, ',', ' ') }} €</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="right"><strong>Total (incl. tax)</strong></td>
+                    <td class="right"><strong>{{ quote.total|default('0.00')|number_format(2, ',', ' ') }} €</strong>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="mt-24 small muted">
+        Status: {{ quote.status }} · #{{ quote.id }}
+    </div>
+</body>
+
+</html>

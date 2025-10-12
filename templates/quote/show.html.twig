@@ -173,6 +173,10 @@
                             <dt class="text-gray-500 dark:text-gray-400">Quote ID</dt>
                             <dd class="font-medium text-gray-900 dark:text-gray-100">#{{ quote.id }}</dd>
                         </div>
+                        <a href="{{ path('quote_pdf', {id: quote.id }) }}"
+                            class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500">
+                            Export PDF
+                        </a>
                     </dl>
                 </div>
             </aside>
