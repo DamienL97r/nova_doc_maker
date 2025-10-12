@@ -80,6 +80,10 @@ class Quote
     {
         $this->issueDate = new \DateTimeImmutable();
         $this->items = new ArrayCollection();
+
+        $this->subTotal = '0.00';
+        $this->taxTotal = '0.00';
+        $this->total    = '0.00';
     }
 
     public function getId(): ?Ulid
@@ -187,7 +191,7 @@ class Quote
         return $this;
     }
 
-    /** @return Collection<int, QuoteItem> */
+    /** @return Collection<int, Product> */
     public function getItems(): Collection
     {
         return $this->items;
