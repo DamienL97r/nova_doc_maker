@@ -76,6 +76,9 @@
                         <td class="whitespace-nowrap px-6 py-3 text-right text-sm">
                             <a href="{{ path('quote_show', {id: q.id}) }}"
                                 class="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">View</a>
+                            <a href="{{ path('quote_pdf', {id: q.id}) }}"
+                                class="text-indigo-600 hover:underline">PDF</a>
+                            {# pour affichage inline (prévisu) : ?download=0 #}
                         </td>
                     </tr>
                     {% else %}
