@@ -2,6 +2,7 @@
 
 {{ form_start(form, { attr: { class: 'space-y-12', novalidate: 'novalidate' } }) }}
 
+{# ==================== QUOTE (infos générales) ==================== #}
 <div class="border-b border-gray-900/10 pb-12 dark:border-white/10">
     <h2 class="text-base/7 font-semibold text-gray-900 dark:text-white">Quote</h2>
     <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Informations générales du devis.</p>
@@ -11,16 +12,71 @@
         {{ form_row(form.title, { row_attr: { class: 'sm:col-span-4' } }) }}
         {{ form_row(form.customer, { row_attr: { class: 'sm:col-span-3' } }) }}
         {{ form_row(form.owner, { row_attr: { class: 'sm:col-span-3' }, label: 'Owner (issuer)' }) }}
-        {{ form_row(form.issueDate, { row_attr: { class: 'sm:col-span-3' } }) }}
+        {{ form_row(form.issueDate,{ row_attr: { class: 'sm:col-span-3' } }) }}
         {{ form_row(form.validUntil,{ row_attr: { class: 'sm:col-span-3' } }) }}
         {{ form_row(form.status, { row_attr: { class: 'sm:col-span-2' } }) }}
     </div>
 </div>
 
+{# ==================== PRODUCTS (collection) ==================== #}
+<div class="border-b border-gray-900/10 pb-12 dark:border-white/10">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-base/7 font-semibold text-gray-900 dark:text-white">Products</h2>
+            <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
+                Ajoutez les lignes (intitulé, quantité, prix unitaire HT, TVA).
+            </p>
+        </div>
+        <button type="button" id="add-item" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm
+             hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2
+             focus-visible:outline-offset-2 focus-visible:outline-indigo-600
+             dark:bg-indigo-500 dark:shadow-none dark:focus-visible:outline-indigo-500">
+            + Add product
+        </button>
+    </div>
+
+    {# Wrapper de la collection avec prototype #}
+    <div id="items-wrapper" class="mt-6 space-y-4" data-index="{{ form.items|length }}"
+        data-prototype="{{ form_widget(form.items.vars.prototype)|e('html_attr') }}">
+        {# Lignes existantes #}
+        {% for itemForm in form.items %}
+        <div class="item rounded-2xl border border-gray-200 dark:border-white/10 p-4">
+            <div class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-12">
+                {# Si ton theme gère bien form_row() par champ, tu peux détailler champ par champ :
+                Sinon, {{ form_row(itemForm) }} marche aussi, mais ici on pose une grille propre. #}
+                <div class="sm:col-span-6">
+                    {{ form_row(itemForm.title) }}
+                </div>
+                <div class="sm:col-span-2">
+                    {{ form_row(itemForm.quantity) }}
+                </div>
+                <div class="sm:col-span-2">
+                    {{ form_row(itemForm.unitPrice) }}
+                </div>
+                <div class="sm:col-span-2">
+                    {{ form_row(itemForm.taxRate) }}
+                </div>
+            </div>
+
+            <div class="mt-3 flex justify-end">
+                <button type="button" class="remove-item rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm
+                         hover:bg-red-500 focus-visible:outline focus-visible:outline-2
+                         focus-visible:outline-offset-2 focus-visible:outline-red-600
+                         dark:bg-red-500 dark:shadow-none dark:focus-visible:outline-red-500">
+                    Remove
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{# ==================== TOTALS ==================== #}
 <div class="border-b border-gray-900/10 pb-12 dark:border-white/10">
     <h2 class="text-base/7 font-semibold text-gray-900 dark:text-white">Totals</h2>
-    <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Saisissez les montants ou laissez-les vides si calculés
-        ailleurs.</p>
+    <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
+        Saisissez les montants ou laissez-les vides si calculés ailleurs.
+    </p>
 
     <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
         {{ form_row(form.subTotal, { row_attr: { class: 'sm:col-span-2' } }) }}
@@ -29,14 +85,81 @@
     </div>
 </div>
 
+{# Rendre le reste (hidden fields, CSRF) #}
 {{ form_rest(form) }}
 
 <div class="mt-6 flex items-center justify-end gap-x-6">
     <a href="{{ path('quote_index') }}" class="text-sm/6 font-semibold text-gray-900 dark:text-white">Cancel</a>
-    <button type="submit"
-        class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:shadow-none dark:focus-visible:outline-indigo-500">
+    <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm
+           hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2
+           focus-visible:outline-offset-2 focus-visible:outline-indigo-600
+           dark:bg-indigo-500 dark:shadow-none dark:focus-visible:outline-indigo-500">
         {{ button_label|default('Save') }}
     </button>
 </div>
 
 {{ form_end(form, { render_rest: false }) }}
+
+{# ==================== JS: gestion de la Collection ==================== #}
+<script>
+    (function () {
+        // Empêche d'attacher les handlers plusieurs fois
+        let bound = false;
+
+        function initQuoteItems() {
+            if (bound) return;
+            const wrapper = document.getElementById('items-wrapper');
+            const addBtn = document.getElementById('add-item');
+            if (!wrapper || !addBtn) return;
+
+            // index de départ = nb d'items existants (ou data-index si présent)
+            let index = Number(wrapper.dataset.index || wrapper.querySelectorAll('.item').length || 0);
+
+            function addItem() {
+                const prototype = wrapper.dataset.prototype.replace(/__name__/g, String(index));
+                index++;
+
+                const outer = document.createElement('div');
+                outer.className = 'item rounded-2xl border border-gray-200 dark:border-white/10 p-4';
+                outer.innerHTML = `
+        <div class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-12">
+          ${prototype}
+        </div>
+        <div class="mt-3 flex justify-end">
+          <button type="button"
+                  class="remove-item rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm
+                         hover:bg-red-500 focus-visible:outline focus-visible:outline-2
+                         focus-visible:outline-offset-2 focus-visible:outline-red-600
+                         dark:bg-red-500 dark:shadow-none dark:focus-visible:outline-red-500">
+            Remove
+          </button>
+        </div>
+      `;
+                wrapper.appendChild(outer);
+                // garde l'index à jour si tu reviens plus tard
+                wrapper.dataset.index = String(index);
+            }
+
+            addBtn.addEventListener('click', addItem);
+
+            // Event delegation pour les remove dynamiques
+            wrapper.addEventListener('click', (e) => {
+                const btn = e.target.closest('.remove-item');
+                if (btn) {
+                    e.preventDefault();
+                    const item = btn.closest('.item');
+                    if (item) item.remove();
+                }
+            });
+
+            bound = true;
+        }
+
+        // Pour navigation pleine page
+        document.addEventListener('DOMContentLoaded', initQuoteItems);
+        // Pour navigation Turbo (Symfony UX Turbo/Hotwire)
+        document.addEventListener('turbo:load', initQuoteItems);
+        // Si tu utilises des <turbo-frame>, décommente la ligne suivante :
+        // document.addEventListener('turbo:frame-load', initQuoteItems);
+    })();
+</script>

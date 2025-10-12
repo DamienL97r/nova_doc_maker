@@ -8,6 +8,7 @@ use App\Entity\Owner;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -62,18 +63,30 @@ class QuoteType extends AbstractType
                 'label' => 'Subtotal (excl. tax)',
                 'currency' => 'EUR',
                 'scale' => 2,
+                'disabled' => true,
             ])
             ->add('taxTotal', MoneyType::class, [
                 'required' => false,
                 'label' => 'Tax',
                 'currency' => 'EUR',
                 'scale' => 2,
+                'disabled' => true,
             ])
             ->add('total', MoneyType::class, [
                 'required' => false,
                 'label' => 'Total (incl. tax)',
                 'currency' => 'EUR',
                 'scale' => 2,
+                'disabled' => true,
+            ])
+            ->add('items', CollectionType::class, [
+                'entry_type'    => ProductType::class,
+                'entry_options' => ['label' => false],
+                'allow_add'     => true,
+                'allow_delete'  => true,
+                'by_reference'  => false,
+                'prototype'     => true,
+                'label'         => 'Products',
             ])
         ;
     }
