@@ -13,6 +13,8 @@ WORKDIR /var/www/app
 # Paquets PHP & outils
 RUN set -eux; \
     apk add --no-cache \
+    php84 \
+    php84-cli \
     php84-phar \
     php84-mbstring \
     php84-iconv \
@@ -35,7 +37,9 @@ RUN set -eux; \
     git \
     curl \
     ca-certificates; \
-    update-ca-certificates
+    update-ca-certificates; \
+    # Si "php" n'est pas dans le PATH, crée un alias vers php84 (pour #!/usr/bin/env php)
+    command -v php >/dev/null 2>&1 || ln -s /usr/bin/php84 /usr/local/bin/php
 
 # ---- Tailwind CSS (binaire Alpine/musl) ----
 # IMPORTANT: on télécharge *tailwindcss-linux-x64-musl* (et pas linux-x64)
@@ -76,12 +80,19 @@ COPY --chown=www-data:www-data composer.json composer.lock ./
 # Vendor en volume (comme tu fais déjà via docker compose)
 VOLUME /var/www/app/vendor
 
-# Entrypoint custom
+# ---- Entrypoint custom ----
 COPY --link .docker/php/entrypoint.sh /usr/local/bin/entrypoint
-RUN set -eux; chmod +x /usr/local/bin/entrypoint
+RUN set -eux; \
+    chmod +x /usr/local/bin/entrypoint; \
+    sed -i 's/\r$//' /usr/local/bin/entrypoint
 
-# Démarrage
-ENTRYPOINT ["entrypoint"]
+# (Optionnel) nettoyage au build — n'agit pas si tu bind-mount le code ensuite
+RUN set -eux; \
+    sed -i 's/\r$//' bin/console 2>/dev/null || true; \
+    chmod +x bin/console 2>/dev/null || true
+
+ENTRYPOINT ["/usr/local/bin/entrypoint"]
+
 
 # =========================
 # (Optionnel) Stage DB
@@ -97,10 +108,8 @@ FROM nginx:alpine AS nginx_dev
 WORKDIR /var/www/app/public
 
 RUN set -eux; \
-    echo -e "\e[1;33m===> Creating www-data user for PHP-FPM\e[0m"; \
     adduser -D -u 82 -S -G www-data -s /sbin/nologin www-data; \
-    chown -R www-data:www-data /var/www/app; \
-    echo -e "\e[1;33m===> Set ownership of /var/www to www-data:www-data\e[0m"
+    chown -R www-data:www-data /var/www/app
 
 # Config Nginx
 COPY --link .docker/nginx/sites-enabled/api.conf /etc/nginx/conf.d/default.conf
