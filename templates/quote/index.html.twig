@@ -2,16 +2,51 @@
 {% block title %}Quotes{% endblock %}
 
 {% block body %}
-<div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8" data-controller="quote-ai"
+    data-quote-ai-endpoint-preview="{{ path('ai_quotes_preview') }}"
+    data-quote-ai-endpoint-create="{{ path('ai_quotes_create') }}">
     <div class="flex items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Quotes</h1>
             <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">{{ quotes|length }} result(s)</p>
         </div>
+
         <a href="{{ path('quote_new') }}"
-            class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
             New quote
         </a>
+
+        {# ✅ le bouton est maintenant dans le scope du contrôleur #}
+        <button type="button" data-action="click->quote-ai#open"
+            class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
+            New Quote with AI
+        </button>
+    </div>
+
+    {# --- Modale (target "modal") --- #}
+    <div data-quote-ai-target="modal" class="relative z-50 hidden">
+        <div class="fixed inset-0 bg-black/50" data-action="click->quote-ai#close"></div>
+
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-lg w-full max-w-lg">
+                <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">New Quote with AI</h2>
+
+                <textarea data-quote-ai-target="input"
+                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                    rows="4" placeholder="Describe the quote (customer, owner, products...)"></textarea>
+
+                <div class="mt-4 flex justify-end gap-2">
+                    <button type="button" data-action="click->quote-ai#close"
+                        class="px-4 py-2 rounded-md bg-gray-300 dark:bg-gray-700">Cancel</button>
+                    <button type="button" data-action="click->quote-ai#preview"
+                        class="px-4 py-2 rounded-md bg-indigo-600 text-white">Preview</button>
+                </div>
+
+                <pre data-quote-ai-target="preview"
+                    class="mt-4 p-3 text-sm bg-gray-100 dark:bg-gray-800 rounded overflow-x-auto"></pre>
+                <div data-quote-ai-target="errors" class="hidden text-red-600 text-sm mt-2"></div>
+            </div>
+        </div>
     </div>
 
     <div

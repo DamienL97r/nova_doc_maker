@@ -1,0 +1,21 @@
+ai:
+  platform:
+    openai:
+      api_key: '%env(OPENAI_API_KEY)%'
+
+  model:
+    openai:
+      gpt-4o-mini:
+        capabilities:
+          - input-text
+          - input-messages
+          - output-text
+          - output-structured
+          - output-streaming
+          - tool-calling
+
+  agent:
+    chat:
+      platform: ai.traceable_platform.openai
+      model: gpt-4o-mini
+      structured_output: true
